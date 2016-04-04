@@ -34,6 +34,10 @@
 
 https://github.com/edagarli/monitor-example/
 
+## contact me ##
+
+Weibo: [@edagarli](http://weibo.com/edagarli)
+
 ## 开源协议
 
 [MIT](https://github.com/2-dfire/twodfire-monitor/blob/master/LICENSE)
