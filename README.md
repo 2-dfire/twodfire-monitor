@@ -12,7 +12,7 @@
 ## 使用
 
 * 你可以直接下载源码或者直接使用jar (https://github.com/2-dfire/twodfire-monitor/releases/tag/1.0)
-* 配置文件
+* 配置文件（具体表达式自己根据项目需要配置）
 
 ``` 
 
@@ -21,7 +21,7 @@
     </bean>
 
     <aop:config>
-        <aop:aspect id="TestAspect" ref="monitorAround">
+        <aop:aspect id="testAspect" ref="monitorAround">
             <aop:pointcut id="timeMonitorPointcut"
                           expression="execution(* *..service*..*(..))"/>
             <aop:around pointcut-ref="timeMonitorPointcut" method="watchPerformance"/>
