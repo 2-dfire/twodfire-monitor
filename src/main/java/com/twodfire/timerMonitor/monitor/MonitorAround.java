@@ -26,37 +26,54 @@ public class MonitorAround {
 
     public Object watchPerformance(ProceedingJoinPoint joinpoint) throws Throwable {
         Object result = null;
+        QuestInfo questInfo = null;
+        long startTime = 0L;
+        long endTime = 0L;
         try {
-            QuestInfo questInfo = myThreadLocal.get();
+            questInfo = (QuestInfo)this.myThreadLocal.get();
             if (questInfo == null) {
-                questInfo = new QuestInfo(new LinkedList<MethodInfo>());
+                questInfo = new QuestInfo(new LinkedList());
                 questInfo.setStartTime(System.nanoTime());
-                myThreadLocal.set(questInfo);
+                this.myThreadLocal.set(questInfo);
             }
-
             questInfo.increaseLevel();
-            long startTime = System.nanoTime();
+            startTime = System.nanoTime();
+        } catch (Throwable e) {
+            this.loggerMonitor.error(e.getMessage(), e);
+            this.myThreadLocal.remove();
+        }
+        try
+        {
             result = joinpoint.proceed();
-            long endTime = System.nanoTime();
+        } catch (Throwable e) {
+            this.myThreadLocal.remove();
+            throw e;
+        }
+
+        try
+        {
+            endTime = System.nanoTime();
             questInfo.decreaseLevel();
-            MethodInfo methodInfo=new MethodInfo(
-                    questInfo.getLevel(),/*层次*/
-                    joinpoint.getSignature().toString(),/*方法名字*/
-                    startTime,/*开始时间*/
-                    endTime);/*结束时间*/
+
+            MethodInfo methodInfo = new MethodInfo(questInfo
+                    .getLevel(), joinpoint
+                    .getSignature().toString(),
+                    Long.valueOf(startTime),
+                    Long.valueOf(endTime));
 
             questInfo.getLinkedList().add(methodInfo);
             if (questInfo.getLevel() == 0) {
-                myThreadLocal.remove();
-                if (( endTime-startTime) > maxTime*1000000) {
-                    StringBuilder sbOut=new StringBuilder("TimeMonitor Warn:TimeOut:\n");
+                this.myThreadLocal.remove();
+                if (endTime - startTime > this.maxTime * 1000000)
+                {
+                    StringBuilder sbOut = new StringBuilder("TimeMonitor Warn:LongTime:\n");
                     sbOut.append(questInfo.toString());
-                    loggerMonitor.warn(sbOut.toString());
+                    this.loggerMonitor.warn(sbOut.toString());
                 }
             }
         } catch (Throwable e) {
-            myThreadLocal.remove();
-            throw e;
+            this.loggerMonitor.error(e.getMessage(), e);
+            this.myThreadLocal.remove();
         }
         return result;
     }

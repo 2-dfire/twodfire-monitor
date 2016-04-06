@@ -65,20 +65,20 @@ public class QuestInfo {
      */
     private String getAappendString(boolean isLeaf/*是否叶子节点*/,MethodInfo methodInfo)
     {
-        StringBuilder stringBuilder=new StringBuilder();
-        for(int i=0;i<methodInfo.getLevel();i++)
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < methodInfo.getLevel(); i++)
         {
-            stringBuilder.append("    ");//增加缩进
+            stringBuilder.append("    ");
         }
-        if(isLeaf)
+        if (isLeaf)
         {
             stringBuilder.append("+---[");
-        }else {
-            stringBuilder.append("---+[");
         }
-        stringBuilder.append((methodInfo.getStartTime()-this.getStartTime())/1000000).append("-");
-        stringBuilder.append((methodInfo.getEndTime()-this.getStartTime())/1000000).append("]");
-        stringBuilder.append((methodInfo.getEndTime()-methodInfo.getStartTime())/1000000).append("ms ");
+        else stringBuilder.append("---+[");
+
+        stringBuilder.append((methodInfo.getStartTime().longValue() - getStartTime()) / 1000000L).append("-");
+        stringBuilder.append((methodInfo.getEndTime().longValue() - getStartTime()) / 1000000L).append("]");
+        stringBuilder.append((methodInfo.getEndTime().longValue() - methodInfo.getStartTime().longValue()) / 1000000L).append("ms ");
         stringBuilder.append(methodInfo.getMethodName()).append("\n");
         return stringBuilder.toString();
     }
@@ -90,26 +90,25 @@ public class QuestInfo {
      * @param endIndex  结束的标记位 包含
      * @return
      */
-    private String printTree( LinkedList<MethodInfo> linkedList,int startIndex ,int endIndex)//初始为 0   size-1
+    private String printTree(LinkedList<MethodInfo> linkedList, int startIndex, int endIndex)
     {
-        StringBuilder stringBuilder=new StringBuilder();
-        int headLevel=linkedList.get(endIndex).getLevel();
-        if(startIndex==endIndex) {
-            stringBuilder.append(getAappendString(true, linkedList.get(endIndex)));//叶子节点
-            return  stringBuilder.toString();
+        StringBuilder stringBuilder = new StringBuilder();
+        int headLevel = ((MethodInfo)linkedList.get(endIndex)).getLevel();
+        if (startIndex == endIndex) {
+            stringBuilder.append(getAappendString(true, (MethodInfo)linkedList.get(endIndex)));
+            return stringBuilder.toString();
         }
-        else {
-            stringBuilder.append(getAappendString(false,linkedList.get(endIndex)));
-        }
-        //打印完头结点 从前往后着个扫描level低一级的树
-        int nextHeadLevel=headLevel+1;//下一层的头结点的层数  最头上的层数的是0 下一层是1
-        int tempStartIndex=startIndex;
-        for(int i= startIndex;i<endIndex;i++)
+
+        stringBuilder.append(getAappendString(false, (MethodInfo)linkedList.get(endIndex)));
+
+        int nextHeadLevel = headLevel + 1;
+        int tempStartIndex = startIndex;
+        for (int i = startIndex; i < endIndex; i++)
         {
-            if(linkedList.get(i).getLevel()==nextHeadLevel)//找到了下一层树的头  ps:如果有跳跃层级的现象 说明原始的list有问题 就不会被打印了
+            if (((MethodInfo)linkedList.get(i)).getLevel() == nextHeadLevel)
             {
-                stringBuilder.append(printTree(linkedList,tempStartIndex,i));//递归
-                tempStartIndex=i+1;
+                stringBuilder.append(printTree(linkedList, tempStartIndex, i));
+                tempStartIndex = i + 1;
             }
         }
         return stringBuilder.toString();
