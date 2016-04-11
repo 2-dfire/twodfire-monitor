@@ -46,6 +46,7 @@ public class MonitorAround {
         {
             result = joinpoint.proceed();
         } catch (Throwable e) {
+            this.myThreadLocal.remove();
             throw e;
         }
 
